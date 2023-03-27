@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	  <link rel="stylesheet" type="text/css" href="buy.css">
+	  <script type="text/javascript">
+		var items = [
+		{id:0,name:"COOL SRI LANKAN CAP TOP",price:11.99},
+		{id:1,name:"PRINTED PICTURE FOR HOME DECOR",price:26},
+		{id:2,name:"MENS WHITE AND ORANGE SHIRT",price:29.99},
+		{id:3,name:"MENS WHITE AND BLUE SHIRT",price:29.97}
+		];
+
+		var cart =[];
+		function addToCart(id)
+		{
+		var isItemAlreadyInCart = false;
+
+			//finding whether the item is in the cart or not
+		 for(var i=0;i<cart.length;i++)
+			  {
+				thisCartItem  = cart[i];
+				if (thisCartItem.id == id)
+				{
+				  isItemAlreadyInCart = true;
+				}
+			  }
+			//end
+		  if (isItemAlreadyInCart == false)//if item is not in the cart
+		  {
+			  for(var i=0;i<items.length;i++)
+			  {
+				thisItem  = items[i];
+				if (thisItem.id == id)
+				{
+				  thisItemInCart ={
+					id:thisItem.id,name:thisItem.name,price:thisItem.price,quantity:1
+				  };
+				  cart[cart.length] = thisItemInCart;
+				  break;
+				}
+			  }
+			}
+			else// item is already in the cart
+			{
+			  for(var i=0;i<cart.length;i++)
+			  {
+				thisCartItem  = cart[i];
+				if (thisCartItem.id == id)
+				{
+				  thisCartItem.quantity++;
+				}
+			  }
+			}
+			//checking whether the cart should be shown
+			if (cart.length>0)
+			{
+			//show cart
+			var cartHTML =`
+			<div id="cartPopUp">
+			  <table id="Product">
+				<tr >
+				<td>Item no</td><td>Product Name</td><td> Unit price</td><td>Qty</td><td>Sub total</td>
+				</tr>
+			`;
+			  for (var i=0;i<cart.length;i++)
+			  {var itemNum = i+1;
+				var thisItemInCart = cart[i];
+				var thisItemSubTotal = thisItemInCart.quantity  * thisItemInCart.price
+				cartHTML += `<tr><td>`+itemNum+`</td><td>`+thisItemInCart.name+`</td><td>`+thisItemInCart.price+`</td><td><input id="cartQty_`+thisItemInCart.id+`" onchange="changeQuantity(`+thisItemInCart.id+`)" type="text" class="qty_input" value="`+thisItemInCart.quantity+`"></td><td id="subTotal_`+thisItemInCart.id+`">`+thisItemSubTotal+`</td></tr>`
+			  }
+			}
+		total =0;
+		for (var i=0;i<cart.length;i++)
+			  {
+				var thisItemInCart = cart[i];
+				var subTotalForThisItem = thisItemInCart.price * thisItemInCart.quantity;
+				total += subTotalForThisItem;
+			  }
+		cartHTML += `<tr><td >Total</td><td></td><td></td><td></td><td id="total">`+roundTo2Decimals(total)+`</td></tr>`;
+
+		cartHTML += "</table>"
+
+		cartHTML += `Name: <input type="text" id="userName"/>Email: <input type="text" id="userEmail"/><br/><br><button onclick="placeOrder();" id="button">Place order</button>`;
+
+		cartHTML += "</div>";
+
+		document.getElementById("cartPopUpBoxHolder").innerHTML = cartHTML;
+			console.log(cartHTML)
+		}
+
+		function changeQuantity(id)
+		{
+		  var newQuantity = document.getElementById("cartQty_" + id).value;
+
+		  if (newQuantity < 0)
+		  {
+			alert("Invalid quantity!")
+			return 0;
+		  }
+
+		   for(var i=0;i<cart.length;i++)
+			  {
+				thisCartItem  = cart[i];
+				if (thisCartItem.id == id)
+				{
+				  thisCartItem.quantity = newQuantity;
+				  updateSubTotal(id ,thisCartItem.quantity * thisCartItem.price );
+				  updateTotal();
+				  break;
+				}
+			  }
+
+		}
+
+		function updateSubTotal(id,subTotal)
+		{
+		document.getElementById("subTotal_"+id).innerHTML = subTotal;
+		}
+
+		function updateTotal()
+		{
+		  total =0;
+
+		for (var i=0;i<cart.length;i++)
+			  {
+				var thisItemInCart = cart[i];
+				var subTotalForThisItem = thisItemInCart.price * thisItemInCart.quantity;
+				total += subTotalForThisItem;
+			  }
+
+		document.getElementById("total").innerHTML = roundTo2Decimals(total);
+		}
+
+		function roundTo2Decimals(num)
+		{
+		  return Math.round(num*100)/100;
+		}
+
+		function placeOrder()
+		{
+
+		  //name check.email check, all qty in cart check
+		  //all good ==> alert summary
+		if(quantity=0)
+		{
+		  alert("quantity not added")
+		  return 0;
+		}
+		//********************************************************************qtyy check skipped
+		  var userName = document.getElementById("userName").value;
+		  var userEmail = document.getElementById("userEmail").value;
+		//
+
+		if(userName == "" || userEmail == "")
+		{
+		  //error case
+		  alert("User name or mail is not filled!")
+		  return 0;
+
+		}
+
+
+		// okay ==> show the summary
+
+		var summaryText ='';
+
+		summaryText+='Name : ' + userName + '\n';
+		summaryText+='Email : ' + userEmail + '\n';
+		summaryText += "Invoice details\n--------------------------\n"
+
+
+		total =0;
+
+		for (var i=0;i<cart.length;i++)
+		  {
+			var thisItemInCart = cart[i];
+			subTotal =thisItemInCart.quantity*thisItemInCart.price;
+			total+=subTotal
+		  summaryText+="Product : " + thisItemInCart.name + "\n Quantity:  " +thisItemInCart.quantity + "\n Price : "+subTotal+ "\n\n";
+		  }
+
+		summaryText += "Total bill: " + roundTo2Decimals(total);
+		alert(summaryText)
+		}
+		  </script>
+
+
+  
+	</head>
+	<body>
+
+	   <div id="grad1"></div>
+	   <h1 class="h1" >SRI LANKAN PRODUCTS</h1>
+	   <div id="grad2"></div>
+	  
+
+	  <div class="column">
+		<div class="card">
+		  <img src="9.jpg" class="img" alt="keytag"  >
+		  <h3>COOL SRI LANKAN CAP TOP</h3>
+		  <p class="price">$11.99</p>
+		  
+		  <p><button onclick="addToCart(0);" >Add to Cart</button></p>
+		</div>
+	   </div>
+	  <div class="column">  
+		<div class="card">
+		  <img src="13.jpg" class="img" alt="shield"  >
+		  <h3>PRINTED PICTURE FOR HOME DECOR</h3>
+		  <p class="price">$26</p>
+		  
+		  <p><button onclick="addToCart(1);" >Add to Cart</button></p>
+		</div>
+	  </div>  
+	  <div class="column">  
+		<div class="card">
+		  <img src="4.jpg" alt="mask" class="img" >
+		  <h3>MENS WHITE AND ORANGE SHIRT</h3>
+		  <p class="price">$29.99</p>
+		 
+		  <p><button onclick="addToCart(2);">Add to Cart</button></p>
+		</div>
+	   </div>
+	   <div class="column">  
+		<div class="card">
+		  <img src="5.jpg" alt="mask"  class="img">
+		  <h3>MENS WHITE AND BLUE SHIRT</h3>
+		  <p class="price">$29.97</p>
+		 
+		  <p><button onclick="addToCart(3);">Add to Cart</button></p>
+		</div>
+	   </div>
+	<div id="cartPopUpBoxHolder"></div>
+
+	</body>
+</html>
